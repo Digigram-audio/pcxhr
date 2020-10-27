@@ -52,13 +52,7 @@ This will allow you to install the driver for the currently running kernel. If y
 
 ##### I.2) Download the driver package
 
-Go [here](https://github.com/Digigram-audio/pcxhr) to download the package. To do that, check out to the latest version (`2.0.12` at the time of writing) :
-
-![Checking out the tag](.images/github-check_tag.png "Checking out the tag")
-
-Then, download the Debian package located in the `src/PCX-VX-dkms` directory :
-
-![Downloading Debian package](.images/github-download_deb.png "Downloading Debian package")
+Choose the latest `.deb` package on the [Releases](https://github.com/Digigram-audio/pcxhr/releases) page.
 
 ##### I.3) Install the driver package
 
@@ -89,13 +83,7 @@ This will allow you to install the driver for the currently running kernel. If y
 
 ##### I.2) Download the driver package
 
-Go [here](https://github.com/Digigram-audio/pcxhr) to download the package. To do that, check out to the latest version (`2.0.12` at the time of writing) :
-
-![Checking out the tag](.images/github-check_tag.png "Checking out the tag")
-
-Then, download the RPM package located in the `PCX-VX-dkms` directory :
-
-![Downloading RPM package](.images/github-download_rpm.png "Downloading RPM package")
+Choose the latest `.rpm` package on the [Releases](https://github.com/Digigram-audio/pcxhr/releases) page.
 
 ##### I.3) Install the driver package
 
@@ -144,20 +132,20 @@ Clone the [Digigram Github repository](https://github.com/Digigram-audio/pcxhr) 
 $ git clone https://github.com/Digigram-audio/pcxhr
 ```
 
-Go into the cloned repository, list the available version tags, and check out to the latest one (`2.0.12` at the time of writing) :
+Go into the cloned repository, list the available version tags, and check out to the latest one (`v2.0.12` at the time of writing) :
 
 ```bash
 $ cd pcxhr
 $ git tag
 [...]
-2.0.12
-$ git checkout 2.0.12
+v2.0.12
+$ git checkout v2.0.12
 ```
 
-Copy the `src/PCX-VX` directory to <code>/usr/src/pcxhr-<em>&lt;version></em></code>, replacing <code><em>&lt;version></em></code> with the one from the previous command (the target directory has to have exactly that name). In our example, the command is :
+Copy the `src/` directory to <code>/usr/src/pcxhr-<em>&lt;version></em></code>, replacing <code><em>&lt;version></em></code> with the one from the previous command without the "v" prefix (the target directory has to have exactly that name). In our example, the command is :
 
 ```bash
-$ sudo cp -r ./src/PCX-VX /usr/src/pcxhr-2.0.12
+$ sudo cp -r ./src /usr/src/pcxhr-2.0.12
 ```
 
 ##### I.3) Install the driver
@@ -214,22 +202,22 @@ Clone the [Digigram Github repository](https://github.com/Digigram-audio/pcxhr) 
 $ git clone https://github.com/Digigram-audio/pcxhr
 ```
 
-Go into the cloned repository, list the available version tags, and check out to the latest one (`2.0.12` at the time of writing) :
+Go into the cloned repository, list the available version tags, and check out to the latest one (`v2.0.12` at the time of writing) :
 
 ```bash
 $ cd pcxhr
 $ git tag
 [...]
-2.0.12
-$ git checkout 2.0.12
+v2.0.12
+$ git checkout v2.0.12
 ```
 
 ### II) Compile the driver
 
-Go into the `src/PCX-VX` directory, and compile the driver by simply running `make` :
+Go into the `src/` directory, and compile the driver by simply running `make` :
 
 ```bash
-$ cd src/PCX-VX
+$ cd src/
 $ make
 ```
 
