@@ -1,5 +1,11 @@
 name: DKMS package building workflow
-on: workflow_dispatch
+on:
+# Trigger manually
+  workflow_dispatch:
+# Trigger when "v____" tags are pushed
+  push:
+    tags:
+      - 'v**'
 
 jobs:
   build:
