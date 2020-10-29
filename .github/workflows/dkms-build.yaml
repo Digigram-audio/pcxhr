@@ -3,7 +3,7 @@ on: workflow_dispatch
 
 jobs:
   build:
-    name: System image build
+    name: DKMS packages build
     runs-on: ubuntu-18.04
 
     steps:
