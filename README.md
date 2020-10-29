@@ -1,10 +1,12 @@
 # Installing the Linux driver for VX222e
 
 >*Note : these instructions are only useful for :*
->* *VX222e boards with hardware revision IS=06 or higher*
->* *VX222e-Mic boards with hardware revision IS=05 or higher*
+> * *VX222e boards with hardware revision IS=06 or higher*
+> * *VX222e-Mic boards with hardware revision IS=05 or higher*
+> * *PCX924e boards with hardware revision IS=05 or higher*
+> * *PCX924e-Mic boards with hardware revision IS=05 or higher*
 >
->*Earlier VX222e/VX222e-Mic (or any other PCX/VX board) can use the `pcxhr` driver that is already included in the Linux kernel.*
+>*Earlier hardware revisions (or any other PCX/VX board) can use the `snd-pcxhr` driver that is already included in the Linux kernel.*
 
 
 * [Option 1 : Automatic installation](#option-1--automatic-installation)
@@ -223,7 +225,7 @@ $ make
 
 ### III) Install and load the driver
 
-The compilation has generated a kernel module : `snd-pcxhr.ko`. Copy these two modules to the kernel’s modules directory :
+The compilation has generated a kernel module : `snd-pcxhr.ko`. Copy this module to the kernel’s modules directory :
 
 ```bash
 $ sudo mkdir -p /lib/modules/<kernelversion>/kernel/digigram
