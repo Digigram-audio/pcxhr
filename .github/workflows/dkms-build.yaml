@@ -1,0 +1,2 @@
+name: Mock
+on: workflow_dispatch
