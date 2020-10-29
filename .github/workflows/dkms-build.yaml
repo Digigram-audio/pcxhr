@@ -71,6 +71,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./output/${{ step.build_dkms.outputs.checksum_file }}
-          asset_name: ${{ step.build_dkms.outputs.checksum_file }}
+          asset_path: ./output/${{ steps.build_dkms.outputs.checksum_file }}
+          asset_name: ${{ steps.build_dkms.outputs.checksum_file }}
           asset_content_type: text/plain
