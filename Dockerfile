@@ -1,8 +1,13 @@
 FROM centos:8
 
-ENV CARD_MODEL="pcxhr"
-# Set this to the relevant Git tag
-ENV DRIVER_VERSION="2.0.12"
+# Arguments from the `# docker run --build-args` command
+ARG CARD_MODEL
+ARG DRIVER_VERSION
+
+# Transform arguments into persistent environment variables
+ENV CARD_MODEL=${CARD_MODEL:-"undefined_soundcard"}
+ENV DRIVER_VERSION=${DRIVER_VERSION:-"1.0-undef"}
+
 # Built image will be moved here. This should be a host mount to get the output.
 ENV OUTPUT_DIR="/output"
 

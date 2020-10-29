@@ -20,9 +20,14 @@ for i in /lib/modules/* ; do
 	} || _ERROR_MESSAGE ${LINENO} "Unable to build DKMS package"
 done
 
+RPM_PACKAGE="/var/lib/dkms/${CARD_MODEL}/${DRIVER_VERSION}/rpm/${CARD_MODEL}-${DRIVER_VERSION}-1dkms.noarch.rpm"
+DEB_PACKAGE="/var/lib/dkms/${CARD_MODEL}/${DRIVER_VERSION}/deb/${CARD_MODEL}-dkms_${DRIVER_VERSION}_amd64.deb"
+
 {
 	mkdir -p "${OUTPUT_DIR}" && \
-	cp /var/lib/dkms/${CARD_MODEL}/${DRIVER_VERSION}/rpm/${CARD_MODEL}-${DRIVER_VERSION}-1dkms.noarch.rpm ${OUTPUT_DIR} && \
-	cp /var/lib/dkms/${CARD_MODEL}/${DRIVER_VERSION}/deb/${CARD_MODEL}-dkms_${DRIVER_VERSION}_amd64.deb ${OUTPUT_DIR}
+	cp "${RPM_PACKAGE}" "${OUTPUT_DIR}" && \
+	cp "${DEB_PACKAGE}" "${OUTPUT_DIR}"
 } || _ERROR_MESSAGE ${LINENO} "Unable to copy DKMS packages to ${OUTPUT_DIR}"
 
+echo "::set-output name=rpm_package::$(basename ${RPM_PACKAGE})"
+echo "::set-output name=deb_package::$(basename ${DEB_PACKAGE})"
