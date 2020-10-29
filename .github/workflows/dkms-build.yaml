@@ -26,7 +26,7 @@ jobs:
       - name: Build Docker image
         run: |
           docker build \
-            --no-cache \
+          #  --no-cache \
             -t dkms-builder \
             --build-arg=CARD_MODEL="$ENV_CARD_MODEL" \
             --build-arg=DRIVER_VERSION="$ENV_DRIVER_VERSION" \
