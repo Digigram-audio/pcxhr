@@ -1,11 +1,29 @@
-
+/*
+ * Driver for Digigram pcxhr compatible soundcards
+ *
+ * Copyright (c) 2004 by Digigram <alsa@digigram.com>
+ *
+ *   This program is free software; you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation; either version 2 of the License, or
+ *   (at your option) any later version.
+ *
+ *   This program is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with this program; if not, write to the Free Software
+ *   Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307 USA
+ */
 
 
 #include <linux/module.h>
 #include <linux/kernel.h>
 #include <linux/kthread.h>  // for threads
 #include <linux/sched.h>  // for task_struct
-#include <linux/time.h>   // for using jiffies 
+#include <linux/time.h>   // for using jiffies
 #include <linux/timer.h>
 #include <linux/slab.h>
 #include <sound/core.h>
@@ -22,7 +40,7 @@
 */
 void clock_monitoring_treatment(struct pcxhr_mgr *mgr) {
 	int rate = 0;
-	
+
 	if((mgr != NULL) )
 	{
 		mutex_lock(&mgr->timer_mutex);
@@ -35,7 +53,7 @@ void clock_monitoring_treatment(struct pcxhr_mgr *mgr) {
 				pcxhr_set_clock(mgr, mgr->sample_rate_real);
 			}
 		}
-		else {  //on est déjà sur l horloge interne on test si l aes est de retour 
+		else {  //on est déjà sur l horloge interne on test si l aes est de retour
 			pcxhr_get_external_clock(mgr,mgr->expected_clock_type,&rate);
 			if( rate != 0) {
 				snd_printk(KERN_ERR "\tpcxhr_clock_monitoring_tasklet external clock reappears...\n");
@@ -64,13 +82,13 @@ int clock_monitoring_thread(void *ptr) {
 }
 
 int clock_monitoring_thread_init(struct pcxhr_mgr *mgr) {
-   
+
 	char* our_thread="clockMonitoring thread";
 
 	mgr->thread = kthread_create(clock_monitoring_thread,mgr,our_thread);
 	if(mgr->thread == NULL) {
 		snd_printk(KERN_ERR "clock_monitoring_thread_init kthread_create FAILED\n");
-		return -ENOMEM; 
+		return -ENOMEM;
 	}
 	wake_up_process(mgr->thread);
 	return 0;
@@ -109,14 +127,14 @@ int clockMonitor_stop(struct pcxhr_mgr *mgr){
 
 int clockMonitor_start(struct pcxhr_mgr *mgr){
 	mutex_lock(&mgr->timer_mutex);
-	if(mgr->timer_state == 0) { //déjà était démarré... 
+	if(mgr->timer_state == 0) { //déjà était démarré...
 		snd_printk(KERN_INFO "clockMonitor_start %s\n", mgr->shortname);
 
 		init_timer(mgr->clockMonitor_timer);
 		mgr->clockMonitor_timer->function = clockMonitor_timedout;
 		mgr->clockMonitor_timer->data = (unsigned long)mgr;
 		mgr->clockMonitor_timer->expires = jiffies + msecs_to_jiffies(2000);
-		add_timer(mgr->clockMonitor_timer);	
+		add_timer(mgr->clockMonitor_timer);
 		mgr->timer_state = 1;
 	}
 	mutex_unlock(&mgr->timer_mutex);
@@ -132,7 +150,7 @@ int clockMonitor_init(struct pcxhr_mgr *mgr){
 	mgr->clockMonitor_timer = (struct timer_list*) kmalloc(sizeof(struct timer_list), GFP_KERNEL);
 	if(mgr->clockMonitor_timer == NULL){
 		snd_printk(KERN_INFO "clockMonitor_init failed mgr->clockMonitor_timer NULL\n");
-		return -ENOMEM; 
+		return -ENOMEM;
 	}
 	//init_timer(mgr->clockMonitor_timer);
 
@@ -152,10 +170,3 @@ int clockMonitor_free(struct pcxhr_mgr *mgr){
 
 	return 0;
 }
-
-
-
-
-
-
-
