@@ -20,9 +20,10 @@ MODULES_DIR := /lib/modules/$(shell uname -r)/digigram
 # default is the default make target.  The rule here says to run make
 # with a working directory of the directory containing the kernel
 # source and compile only the modules in the PWD (local) directory.
-all: clean default install-firmwares
 default:
 	$(MAKE) -C $(KDIR) M=$(PWD) modules
+
+all: clean default install-firmwares
 
 clean:
 	$(MAKE) -C $(KDIR) M=$(PWD) clean
@@ -42,3 +43,4 @@ install:
 	depmod -ae
 
 	
+.PHONY: default all clean install-firmwares update-firmware install
