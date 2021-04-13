@@ -62,6 +62,7 @@
 #define AKM_LEFT_LEVEL_CMD	0xA600
 #define AKM_RIGHT_LEVEL_CMD	0xA700
 
+
 /* values for PCHR_XLX_STATUS register - READ */
 #define PCXHR_STAT_SRC_LOCK		0x01
 #define PCXHR_STAT_LEVEL_IN		0x02
@@ -91,6 +92,50 @@
 #define PCXHR_SELMIC_PREAMPLI_MASK	0x0C
 #define PCXHR_SELMIC_PHANTOM_ALIM	0x80
 
+
+/*************************************************************/
+/*                                      TI codecs stuff                                */
+/*************************************************************/
+/* TI codecs registers /commands for IE7 boards, PCM1796 is the DAC, PCM4202 is an ADC but not programmable */
+//Actual address is on the upper byte only of the 16bit values
+#define PCXHR_PCM1796_LEFT_LEVEL_REG_ADDR    0x1000
+#define PCXHR_PCM1796_RIGHT_LEVEL_REG_ADDR   0x1100
+
+#define PCXHR_PCM1796_CONF_REG_ADDR       0x1200
+#define PCXHR_PCM1796_OPER_REG_ADDR       0x1300
+
+
+//MUTE level
+#define PCXHR_PCM1796_LEVEL_MUTE_VALUE    0x00
+
+//Init conf : ATLD|FMT(24b,left)
+#define PCXHR_PCM1796_INIT_CONF_CMD           PCM1796_CONF_REG_ADDR | 0xB0
+
+//MUTE bit in operation register
+#define PCXHR_PCM1796_OPER_CONF_MUTE 0x01
+
+//Operation base configuration : Attenuation rate selection : LRCK/2
+#define PCXHR_PCM1796_OPER_CONF_CMD         PCM1796_OPER_REG_ADDR | 0x20
+
+//Settling time once reset Off.
+#define PCXHR_TI_CODECS_SETTLING_TIME_MS 10
+
+//The default sampling rate (in Hz)
+static const unsigned int PCXHR_TI_CODECS_DEFAULT_SAMPLING_RATE = 48000;
+
+//The default clock source
+#define PCXHR_TI_CODECS_DEFAULT_CLOCK_SOURCE CLOCK_TYPE_INTERNAL
+
+static const unsigned char PCXHR_TI_MAX_OUTPUT_CODED_LEVEL = 96;
+
+//! ADC FS ranges border see PCM4202 data sheet (in kHz)
+static const unsigned int PCXHR_TI_ADC_SINGLE_RATE_UPPER_BORDER = 54000;
+static const unsigned int PCXHR_TI_ADC_DUAL_RATE_UPPER_BORDER = 108000;
+
+
+/**************************************************************/
+/*                             KM codecs stuff                                         */
+/**************************************************************/
 
 static const unsigned char g_hr222_p_level[] = {
     0x00,   /* [000] -49.5 dB:	AKM[000] = -1.#INF dB	(mute) */
@@ -195,22 +240,31 @@ static const unsigned char g_hr222_p_level[] = {
     0xff,   /* [099] +0.0 dB:	AKM[255] = +0.000 dB	(diff=0.00000 dB) */
 };
 
-static void hr222_config_akm(struct pcxhr_mgr *mgr, unsigned short data)
+static void hr222_write_to_codec(struct pcxhr_mgr *mgr, unsigned short data)
 {
-	unsigned short mask = 0x8000;
+	/*
+	 * This is Bit banging of a 16 bit value
+    * Activate access to codec registers
+	*/
+		
+	unsigned short bit_mask = 0x8000;
+	
+	//Ensure a write access : b15=0.
+	data &= 0x7FFF;
+	
 	/* activate access to codec registers */
 	PCXHR_INPB(mgr, PCXHR_DSP, PCXHR_XLX_HIFREQ);
 
-	while (mask) {
+	while (bit_mask) {
 		PCXHR_OUTPB(mgr, PCXHR_DSP, PCXHR_XLX_DATA,
-			    data & mask ? PCXHR_DATA_CODEC : 0);
-		mask >>= 1;
+			    data & bit_mask ? PCXHR_DATA_CODEC : 0);
+		bit_mask >>= 1;
 	}
 	/* termiate access to codec registers */
 	PCXHR_INPB(mgr, PCXHR_DSP, PCXHR_XLX_RUER);
 }
 
-static int hr222_set_hw_playback_level(struct pcxhr_mgr *mgr,
+static int hr222_set_akm_hw_playback_level(struct pcxhr_mgr *mgr,
 				       int idx, int level)
 {
 	unsigned short cmd;
@@ -227,11 +281,11 @@ static int hr222_set_hw_playback_level(struct pcxhr_mgr *mgr,
 	/* conversion from PmBoardCodedLevel to AKM nonlinear programming */
 	cmd += g_hr222_p_level[level];
 
-	hr222_config_akm(mgr, cmd);
+	hr222_write_to_codec(mgr, cmd);
 	return 0;
 }
 
-static int hr222_set_hw_capture_level(struct pcxhr_mgr *mgr,
+static int hr222_set_akm_hw_capture_level(struct pcxhr_mgr *mgr,
 				      int level_l, int level_r, int level_mic)
 {
 	/* program all input levels at the same time */
@@ -259,7 +313,9 @@ static int hr222_set_hw_capture_level(struct pcxhr_mgr *mgr,
 
 static void hr222_micro_boost(struct pcxhr_mgr *mgr, int level);
 
-int hr222_sub_init(struct pcxhr_mgr *mgr)
+
+
+static int hr222_akm_sub_init (struct pcxhr_mgr *mgr)
 {
 	unsigned char reg;
 
@@ -283,10 +339,10 @@ int hr222_sub_init(struct pcxhr_mgr *mgr)
 	msleep(5);
 
 	/* config AKM */
-	hr222_config_akm(mgr, AKM_POWER_CONTROL_CMD);
-	hr222_config_akm(mgr, AKM_CLOCK_INF_55K_CMD);
-	hr222_config_akm(mgr, AKM_UNMUTE_CMD);
-	hr222_config_akm(mgr, AKM_RESET_OFF_CMD);
+	hr222_write_to_codec(mgr, AKM_POWER_CONTROL_CMD);
+	hr222_write_to_codec(mgr, AKM_CLOCK_INF_55K_CMD);
+	hr222_write_to_codec(mgr, AKM_UNMUTE_CMD);
+	hr222_write_to_codec(mgr, AKM_RESET_OFF_CMD);
 
 	/* init micro boost */
 	hr222_micro_boost(mgr, 0);
@@ -294,6 +350,10 @@ int hr222_sub_init(struct pcxhr_mgr *mgr)
 	return 0;
 }
 
+int hr222_sub_init(struct pcxhr_mgr *mgr)
+{
+	return hr222_akm_sub_init(mgr);
+}
 
 /* calc PLL register */
 /* TODO : there is a very similar fct in pcxhr.c */
@@ -357,7 +417,7 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 	default:
 		return -EINVAL;
 	}
-	hr222_config_akm(mgr, AKM_MUTE_CMD);
+	hr222_write_to_codec(mgr, AKM_MUTE_CMD);
 
 	if (mgr->use_clock_type == HR22_CLOCK_TYPE_INTERNAL) {
 		PCXHR_OUTPB(mgr, PCXHR_DSP, PCXHR_XLX_HIFREQ, pllreg >> 8);
@@ -372,9 +432,9 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 	if (mgr->codec_speed != speed) {
 		mgr->codec_speed = speed;
 		if (speed == 0)
-			hr222_config_akm(mgr, AKM_CLOCK_INF_55K_CMD);
+			hr222_write_to_codec(mgr, AKM_CLOCK_INF_55K_CMD);
 		else
-			hr222_config_akm(mgr, AKM_CLOCK_SUP_55K_CMD);
+			hr222_write_to_codec(mgr, AKM_CLOCK_SUP_55K_CMD);
 	}
 
 	mgr->sample_rate_real = realfreq;
@@ -383,7 +443,7 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 	if (changed)
 		*changed = 1;
 
-	hr222_config_akm(mgr, AKM_UNMUTE_CMD);
+	hr222_write_to_codec(mgr, AKM_UNMUTE_CMD);
 
 	snd_printdd("set_clock to %dHz (realfreq=%d pllreg=%x)\n",
 		    rate, realfreq, pllreg);
@@ -541,7 +601,7 @@ int hr222_update_analog_audio_level(struct snd_pcxhr *chip,
 			level_mic = chip->mic_volume;
 		else
 			level_mic = HR222_MICRO_CAPTURE_LEVEL_MIN;
-		return hr222_set_hw_capture_level(chip->mgr,
+		return hr222_set_akm_hw_capture_level(chip->mgr,
 						 level_l, level_r, level_mic);
 	} else {
 		int vol;
@@ -549,7 +609,7 @@ int hr222_update_analog_audio_level(struct snd_pcxhr *chip,
 			vol = chip->analog_playback_volume[channel];
 		else
 			vol = HR222_LINE_PLAYBACK_LEVEL_MIN;
-		return hr222_set_hw_playback_level(chip->mgr, channel, vol);
+		return hr222_set_akm_hw_playback_level(chip->mgr, channel, vol);
 	}
 }
 
