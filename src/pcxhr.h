@@ -71,6 +71,11 @@ enum pcxhr_clock_type {
 	HR22_CLOCK_TYPE_MAX = HR22_CLOCK_TYPE_AES_1,
 };
 
+enum pcxhr_board_revision_id{
+	PCXHR_BOARD_REVISION_BEFORE_5 = 0,
+	PCXHR_BOARD_REVISION_5 = 1,
+	PCXHR_BOARD_REVISION_7 = 2,
+};
 
 struct pcxhr_dbg_cpt {
 	unsigned int interrupts_all;
@@ -158,7 +163,25 @@ struct pcxhr_mgr {
 	struct tasklet_struct hr_timer_tasklet;
 
 	struct pcxhr_dbg_cpt dbg_cpt;
+
+	enum pcxhr_board_revision_id board_revision;
 };
+
+/* pcxhr_mgr helpers */
+static inline unsigned int pcxhr_is_board_revision5 (const struct pcxhr_mgr* toTest)
+{
+	return toTest->board_revision == PCXHR_BOARD_REVISION_5;
+}
+
+static inline unsigned int pcxhr_is_board_revision7 (const struct pcxhr_mgr* toTest)
+{
+	return toTest->board_revision == PCXHR_BOARD_REVISION_7;
+}
+
+static inline unsigned int pcxhr_is_board_before_revision5 (const struct pcxhr_mgr* toTest)
+{
+	return toTest->board_revision == PCXHR_BOARD_REVISION_BEFORE_5;
+}
 
 
 enum pcxhr_stream_status {
