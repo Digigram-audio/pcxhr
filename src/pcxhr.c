@@ -206,12 +206,16 @@ static struct board_parameters pcxhr_board_params[] = {
 [PCI_ID_PCX822HR] =        { "PCX822HR",     4, 1, 2, 42 },
 [PCI_ID_VX822E] =          { "VX822e",       4, 1, 3, 42 },
 [PCI_ID_PCX822E] =         { "PCX822e",      4, 1, 3, 42 },
-[PCI_ID_VX222E_IE5] =      { "VX222e",       1, 1, 6, 44 },
-[PCI_ID_PCX924E_IE5] =     { "PCX924e",      1, 1, 7, 44 },
-[PCI_ID_VX222E_MIC_IE5] =  { "VX222e-Mic",   1, 1, 7, 44 },
-[PCI_ID_PCX22E_IE5] =      { "PCX22e",       1, 0, 6, 44 },
-[PCI_ID_PCX924E_MIC_IE5] = { "PCX924e-Mic",  1, 1, 7, 44 },
+[PCI_ID_VX222E_IE5] =      { "VX222e IE5",       1, 1, 6, 44 },
+[PCI_ID_PCX924E_IE5] =     { "PCX924e IE5",      1, 1, 7, 44 },
+[PCI_ID_VX222E_MIC_IE5] =  { "VX222e-Mic IE5",   1, 1, 7, 44 },
+[PCI_ID_PCX22E_IE5] =      { "PCX22e IE5",       1, 0, 6, 44 },
+[PCI_ID_PCX924E_MIC_IE5] = { "PCX924e-Mic IE5",  1, 1, 7, 44 },
 };
+
+/* IE support*/
+static const unsigned int  PCXHR_DEVICE_IE_ID_MASK = 0x00F0;
+static const unsigned int  PCXHR_DEVICE_IE5_ID = 0x0040;
 
 /* boards without hw AES1 and SRC onboard are all using fw_file_set==4 */
 /* VX222HR, VX222e, PCX22HR and PCX22e */
@@ -1606,6 +1610,13 @@ static int pcxhr_free(struct pcxhr_mgr *mgr)
 }
 
 /*
+ *  @return true if the subsystem_id mathes the given ID mask
+ */
+static inline unsigned int pcxhr_is_device_IE (unsigned int sub_system_id, const unsigned int id_mask)
+{
+    return ((sub_system_id & PCXHR_DEVICE_IE_ID_MASK) == id_mask) ? 1 : 0 ;
+}
+/*
  *    probe function - creates the card manager
  */
 static int pcxhr_probe(struct pci_dev *pci,
@@ -1652,6 +1663,12 @@ static int pcxhr_probe(struct pci_dev *pci,
 		pci_disable_device(pci);
 		return -ENODEV;
 	}
+	
+	if (pcxhr_is_device_IE(pci->subsystem_device, PCXHR_DEVICE_IE5_ID))
+        mgr->dsp_reg_offset = 3;
+    else
+        mgr->dsp_reg_offset = 0;
+#if 0
 	switch (pci->subsystem_device) {
 		case 0xba41:
 		case 0xbb41:
@@ -1664,6 +1681,8 @@ static int pcxhr_probe(struct pci_dev *pci,
 			mgr->dsp_reg_offset = 0;
 			break;
 	}
+#endif /* 0 */
+
 	card_name =
 		pcxhr_board_params[pci_id->driver_data].board_name;
 	mgr->playback_chips =
