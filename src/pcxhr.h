@@ -28,8 +28,9 @@
 #include <sound/pcm.h>
 #include "pcxhr_hrtimer.h"
 
-#define PCXHR_DRIVER_VERSION		0x020012	/* 2.0.12 */
-#define PCXHR_DRIVER_VERSION_STRING	"2.0.12"	/* 2.0.12 */
+/* Driver version :  2.0.13 */
+#define PCXHR_DRIVER_VERSION		0x020013
+#define PCXHR_DRIVER_VERSION_STRING	"2.0.13"	
 
 /* Workaround for CentOS/RHEL */
 #ifdef RHEL_RELEASE_CODE
