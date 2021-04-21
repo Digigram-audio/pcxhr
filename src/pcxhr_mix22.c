@@ -277,9 +277,6 @@ static void hr222_write_to_codec(struct pcxhr_mgr *mgr, unsigned short toWrite)
 	
 	snd_printdd("%s() CALLED\n", __FUNCTION__);
 	
-	//Ensure a write access : b15=0.
-	toWrite &= 0x7FFF;
-	
 	snd_printdd("%s() to write : 0x%x\n", __FUNCTION__, toWrite);
 	
 	/* activate access to codec registers */
