@@ -1697,7 +1697,7 @@ static int pcxhr_probe(struct pci_dev *pci,
 	}
 
 	//Select the right registers' addresses offset
-	mgr->dsp_reg_offset = pcxhr_is_board_before_revision5(mgr) ? 0 : 3;
+	mgr->dsp_reg_offset = pcxhr_is_board_revision(mgr, PCXHR_BOARD_REVISION_BEFORE_5) ? 0 : 3;
 
 	card_name =
 		pcxhr_board_params[pci_id->driver_data].board_name;

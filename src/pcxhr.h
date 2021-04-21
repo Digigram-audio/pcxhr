@@ -29,8 +29,8 @@
 #include "pcxhr_hrtimer.h"
 
 /* Driver version :  2.0.13 */
-#define PCXHR_DRIVER_VERSION		0x020013
-#define PCXHR_DRIVER_VERSION_STRING	"2.0.13"	
+#define PCXHR_DRIVER_VERSION				0x020013
+#define PCXHR_DRIVER_VERSION_STRING	"2.0.13"
 
 /* Workaround for CentOS/RHEL */
 #ifdef RHEL_RELEASE_CODE
@@ -164,24 +164,17 @@ struct pcxhr_mgr {
 
 	struct pcxhr_dbg_cpt dbg_cpt;
 
-	enum pcxhr_board_revision_id board_revision;
+	enum pcxhr_board_revision_id board_revision; /* Current board revision (IE values)*/
+	unsigned int pcm1796_operation_reg_value; /* copy of the operation register (REG 19, @0x13) of the PCM1796*/
 };
 
-/* pcxhr_mgr helpers */
-static inline unsigned int pcxhr_is_board_revision5 (const struct pcxhr_mgr* toTest)
+/* pcxhr_mgr board revision helper */
+
+static inline unsigned int pcxhr_is_board_revision (const struct pcxhr_mgr* toTest, const unsigned int tested_revision)
 {
-	return toTest->board_revision == PCXHR_BOARD_REVISION_5;
+	return toTest->board_revision == tested_revision;
 }
 
-static inline unsigned int pcxhr_is_board_revision7 (const struct pcxhr_mgr* toTest)
-{
-	return toTest->board_revision == PCXHR_BOARD_REVISION_7;
-}
-
-static inline unsigned int pcxhr_is_board_before_revision5 (const struct pcxhr_mgr* toTest)
-{
-	return toTest->board_revision == PCXHR_BOARD_REVISION_BEFORE_5;
-}
 
 
 enum pcxhr_stream_status {

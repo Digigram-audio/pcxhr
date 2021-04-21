@@ -244,8 +244,9 @@ void pcxhr_msg_tasklet(unsigned long arg);
 #define PCXHR_XLX_STATUS	0x30
 #define PCXHR_XLX_LOFREQ	0x34
 #define PCXHR_XLX_HIFREQ	0x38
-#define PCXHR_XLX_CSUER		0x3C
+#define PCXHR_XLX_CSUER	0x3C
 #define PCXHR_XLX_SELMIC	0x40
+#define PCXHR_XLX_MUTEIN 	0x7C
 
 #define GET_ADDR(mgr, bar,x)	( ( bar == PCXHR_PLX ) ? ((mgr)->port[PCXHR_PLX] + (x) ):((mgr)->port[PCXHR_DSP] + (x) + mgr->dsp_reg_offset) )
 
