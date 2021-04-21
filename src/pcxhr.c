@@ -690,7 +690,7 @@ static int pcxhr_update_r_buffer(struct pcxhr_stream *stream)
 	stream_num = is_capture ? 0 : subs->number;
 
 	snd_printdd("pcxhr_update_r_buffer(pcm%c%d) : "
-		    "addr(%p) bytes(%zx) subs(%d)\n",
+		    "addr(%p) bytes(%lx) subs(%d)\n",
 		    is_capture ? 'c' : 'p',
 		    chip->chip_idx, (void *)(long)subs->runtime->dma_addr,
 		    subs->runtime->dma_bytes, subs->number);
@@ -759,8 +759,8 @@ static void pcxhr_trigger_tasklet(unsigned long arg)
 	int playback_mask = 0;
 
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	struct timeval my_tv1, my_tv2;
-	do_gettimeofday(&my_tv1);
+	struct timespec64 start_date, end_date, delta_t;
+	ktime_get_real_ts64(&start_date);
 #endif
 	mutex_lock(&mgr->setup_mutex);
 
@@ -871,9 +871,10 @@ static void pcxhr_trigger_tasklet(unsigned long arg)
 	mutex_unlock(&mgr->setup_mutex);
 
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	do_gettimeofday(&my_tv2);
+	ktime_get_real_ts64(&end_date);
+	delta_t = timespec64_sub(end_date, start_date);
 	snd_printdd("***TRIGGER TASKLET*** TIME = %ld (err = %x)\n",
-		    (long)(my_tv2.tv_usec - my_tv1.tv_usec), err);
+		    (long)delta_t.tv_nsec/1000, err);
 #endif
 }
 
@@ -1414,16 +1415,17 @@ static void pcxhr_proc_info(struct snd_info_entry *entry,
 //{
 //   unsigned int uLoop;
 //   unsigned int dsp_time[9];
-//   struct timeval tv[9];
+//   struct timespec64 tv[9];
 //   for ( uLoop = 0; uLoop < 10; uLoop++ )
 //   {
 //      dsp_time[uLoop] = PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX4) & PCXHR_DSP_TIME_MASK;
-//      do_gettimeofday(&tv[uLoop]);
+//      ktime_get_real_ts64(&tv[uLoop]);
 //      udelay(500);
 //   }
 //   for ( uLoop = 0; uLoop < 10; uLoop++ )
 //   {
-//      printk(KERN_ERR "%s [%u] dsp_time_new %u   time %u\n",__func__, uLoop, dsp_time[uLoop], (unsigned int)tv[uLoop].tv_usec);
+		// /1000 : nsec => usec
+//      printk(KERN_ERR "%s [%u] dsp_time_new %u   time %u\n",__func__, uLoop, dsp_time[uLoop], (unsigned int)tv[uLoop].tv_nsec/1000);
 //   }
 //}
 ///////////////GPR
