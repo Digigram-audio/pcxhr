@@ -198,6 +198,8 @@ static const unsigned char g_hr222_p_level[] = {
 static void hr222_config_akm(struct pcxhr_mgr *mgr, unsigned short data)
 {
 	unsigned short mask = 0x8000;
+	snd_printdd("%s() : 0x%x\n", __FUNCTION__, data);
+	
 	/* activate access to codec registers */
 	PCXHR_INPB(mgr, PCXHR_DSP, PCXHR_XLX_HIFREQ);
 
