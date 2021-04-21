@@ -332,7 +332,7 @@ static int hr222_set_ti_hw_playback_level(struct pcxhr_mgr *mgr,
 {
 	unsigned short cmd;
 	
-	snd_printdd("%s() CALLED\n", __FUNCTION__);
+	snd_printdd("%s(channel:%d, level:%d) CALLED\n", __FUNCTION__, channel_id, level);
 	
 	if (channel_id > 1 || pcxhr_ti_is_valid_output_gain_level(level))
 		return -EINVAL;
@@ -352,7 +352,7 @@ static int hr222_set_akm_hw_playback_level(struct pcxhr_mgr *mgr,
 {
 	unsigned short cmd;
 	
-	snd_printdd("%s() CALLED\n", __FUNCTION__);
+	snd_printdd("%s(channel:%d, level:%d) CALLED\n", __FUNCTION__, channel_id, level);
 	
 	if (channel_id > 1 ||
 	    level < 0 ||
