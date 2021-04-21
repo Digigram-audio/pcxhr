@@ -670,7 +670,7 @@ static int pcxhr_update_r_buffer(struct pcxhr_stream *stream)
 	stream_num = is_capture ? 0 : subs->number;
 
 	snd_printdd("pcxhr_update_r_buffer(pcm%c%d) : "
-		    "addr(%p) bytes(%zx) subs(%d)\n",
+		    "addr(%p) bytes(%ld) subs(%d)\n",
 		    is_capture ? 'c' : 'p',
 		    chip->chip_idx, (void *)(long)subs->runtime->dma_addr,
 		    subs->runtime->dma_bytes, subs->number);
@@ -739,8 +739,8 @@ static void pcxhr_trigger_tasklet(unsigned long arg)
 	int playback_mask = 0;
 
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	struct timeval my_tv1, my_tv2;
-	do_gettimeofday(&my_tv1);
+	struct timespec64 start_date, current_date, delta_t;
+	ktime_get_real_ts64(&start_date);
 #endif
 	mutex_lock(&mgr->setup_mutex);
 
@@ -851,9 +851,10 @@ static void pcxhr_trigger_tasklet(unsigned long arg)
 	mutex_unlock(&mgr->setup_mutex);
 
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	do_gettimeofday(&my_tv2);
-	snd_printdd("***TRIGGER TASKLET*** TIME = %ld (err = %x)\n",
-		    (long)(my_tv2.tv_usec - my_tv1.tv_usec), err);
+	ktime_get_real_ts64(&current_date);
+	delta_t = timespec64_sub(current_date, start_date);
+	snd_printdd("***TRIGGER TASKLET*** TIME = %ld us (err = %x)\n",
+		    ((long)delta_t.tv_nsec)/1000, err);
 #endif
 }
 

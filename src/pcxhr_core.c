@@ -877,8 +877,9 @@ int pcxhr_set_pipe_state(struct pcxhr_mgr *mgr, int playback_mask,
 	int audio_mask;
 
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	struct timeval my_tv1, my_tv2;
-	do_gettimeofday(&my_tv1);
+	struct timespec64 start_date, current_date, delta_t;
+	ktime_get_real_ts64(&start_date);
+	
 #endif
 	audio_mask = (playback_mask |
 		      (capture_mask << PCXHR_PIPE_STATE_CAPTURE_OFFSET));
@@ -926,9 +927,10 @@ int pcxhr_set_pipe_state(struct pcxhr_mgr *mgr, int playback_mask,
 			return err;
 	}
 #ifdef CONFIG_SND_DEBUG_VERBOSE
-	do_gettimeofday(&my_tv2);
+	ktime_get_real_ts64(&current_date);
+	delta_t = timespec64_sub(current_date, start_date);
 	snd_printdd("***SET PIPE STATE*** TIME = %ld (err = %x)\n",
-		    (long)(my_tv2.tv_usec - my_tv1.tv_usec), err);
+		    (long)(delta_t.tv_nsec/1000), err);
 #endif
 	return 0;
 }
