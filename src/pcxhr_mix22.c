@@ -331,7 +331,7 @@ static int hr222_set_ti_hw_playback_level(struct pcxhr_mgr *mgr,
 	
 	snd_printdd("%s(channel:%d, level:%d) CALLED\n", __FUNCTION__, channel_id, level);
 	
-	if (channel_id > 1 || pcxhr_ti_is_valid_output_gain_level(level))
+	if (channel_id > 1 || !pcxhr_ti_is_valid_output_gain_level(level))
 		return -EINVAL;
 
 	cmd = (channel_id == 0) ? PCXHR_PCM1796_LEFT_LEVEL_REG_ADDR :
@@ -527,6 +527,7 @@ static int hr222_ti_sub_set_clock(struct pcxhr_mgr *mgr,
 	//full MUTE, set the clock, unmute
 	
 	//  Mute DAC Out : disable operation
+	
 	hr222_write_to_codec(mgr, 
 						 PCXHR_PCM1796_OPER_REG_ADDR | mgr->pcm1796_operation_reg_value | PCXHR_PCM1796_OPER_OPE_DISABLED_BIT);
 	
@@ -622,6 +623,7 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 	
 	snd_printdd("set_clock to %dHz (realfreq=%d pllreg=%x)\n",
 		    rate, realfreq, pllreg);
+
 	return 0;
 }
 
