@@ -397,6 +397,9 @@ int pcxhr_setup_firmware(struct pcxhr_mgr *mgr)
 			continue;
 		}
 		sprintf(path, "pcxhr/%s", fw_files[fw_set][i]);
+		
+		snd_printdd("%s() : loading FW: %s\n", __FUNCTION__, path);
+		
 		if (request_firmware(&fw_entry, path, &mgr->pci->dev)) {
 			snd_printk(KERN_ERR "pcxhr: can't load firmware %s\n",
 				   path);

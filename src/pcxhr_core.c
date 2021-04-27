@@ -307,6 +307,9 @@ static int pcxhr_download_dsp(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 	unsigned int len;
 	const unsigned char *data;
 	unsigned char dummy;
+	
+	snd_printdd("%s() : fw dsp->size:%lu\n", __FUNCTION__, dsp->size);
+	
 	/* check the length of boot image */
 	if (dsp->size <= 0)
 		return -EINVAL;
@@ -314,6 +317,9 @@ static int pcxhr_download_dsp(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 		return -EINVAL;
 	if (snd_BUG_ON(!dsp->data))
 		return -EINVAL;
+	
+	snd_printdd("%s() : do DSP load\n", __FUNCTION__);
+	
 	/* transfert data buffer from PC to DSP */
 	for (i = 0; i < dsp->size; i += 3) {
 		data = dsp->data + i;
@@ -372,6 +378,7 @@ int pcxhr_load_eeprom_binary(struct pcxhr_mgr *mgr,
 	}
 	PCXHR_OUTPB(mgr, PCXHR_DSP, PCXHR_DSP_ICR, reg);
 
+	snd_printdd("Load dsp EEPROM\n");
 	err = pcxhr_download_dsp(mgr, eeprom);
 	if (err)
 		return err;
@@ -393,14 +400,22 @@ int pcxhr_load_boot_binary(struct pcxhr_mgr *mgr, const struct firmware *boot)
 	if (snd_BUG_ON(physaddr & 0xff))
 		return -EINVAL;
 	PCXHR_OUTPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX1, (physaddr >> 8));
+	
+	printk(KERN_INFO"%s(): physaddr=0x%x\n", __FUNCTION__, physaddr);
 
 	err = pcxhr_send_it_dsp(mgr, PCXHR_IT_DOWNLOAD_BOOT, 0);
 	if (err)
 		return err;
 	/* clear hf5 bit */
+	printk(KERN_INFO"%s() : PCXHR_PLX=0x%x, PCXHR_PLX_MBOX0=0x%x\n", __FUNCTION__, PCXHR_PLX, PCXHR_PLX_MBOX0);
+	printk(KERN_INFO"%s() : PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0)=0x%x\n", __FUNCTION__, PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0));
+	
 	PCXHR_OUTPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0,
 		    PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0) & ~PCXHR_MBOX0_HF5);
+	
+	printk(KERN_INFO"%s() : PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0)=0x%x\n", __FUNCTION__, PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_MBOX0));
 
+	snd_printdd("Load dsp Boot\n");
 	err = pcxhr_download_dsp(mgr, boot);
 	if (err)
 		return err;
@@ -422,6 +437,7 @@ int pcxhr_load_dsp_binary(struct pcxhr_mgr *mgr, const struct firmware *dsp)
 	err = pcxhr_send_it_dsp(mgr, PCXHR_IT_DOWNLOAD_DSP, 0);
 	if (err)
 		return err;
+	snd_printdd("Load dsp FW\n");
 	err = pcxhr_download_dsp(mgr, dsp);
 	if (err)
 		return err;
