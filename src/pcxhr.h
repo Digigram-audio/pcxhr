@@ -168,8 +168,13 @@ struct pcxhr_mgr {
 	unsigned int pcm1796_operation_reg_value; /* copy of the operation register (REG 19, @0x13) of the PCM1796*/
 };
 
-/* pcxhr_mgr board revision helper */
+/* IE support*/
+static const unsigned int  PCXHR_DEVICE_IE_ID_MASK = 0x00F0;
+static const unsigned int  PCXHR_DEVICE_IE5_ID = 0x0040;
+static const unsigned int  PCXHR_DEVICE_IE7_ID = 0x0060;
 
+
+/* pcxhr_mgr board revision helper */
 static inline unsigned int pcxhr_is_board_revision (const struct pcxhr_mgr* toTest, const unsigned int tested_revision)
 {
 	return toTest->board_revision == tested_revision;
@@ -261,5 +266,30 @@ int pcxhr_set_clock(struct pcxhr_mgr *mgr, unsigned int rate);
 int pcxhr_get_external_clock(struct pcxhr_mgr *mgr,
 			     enum pcxhr_clock_type clock_type,
 			     int *sample_rate);
+
+/*
+ *  @return true if the subsystem_id mathes the given ID mask
+ */
+static inline unsigned int pcxhr_is_device_IE (unsigned int sub_system_id, const unsigned int proposed_IE)
+{
+	return ((sub_system_id & PCXHR_DEVICE_IE_ID_MASK) == proposed_IE) ? 1 : 0 ;
+}
+/*
+ *  @return true if the subsystem_id is compatible with the given ID
+ */
+static inline unsigned int pcxhr_is_device_compatible_IE (unsigned int sub_system_id, const unsigned int proposed_IE)
+{
+	//Only IE7 is compatible with IE5.
+	if (proposed_IE == PCXHR_DEVICE_IE5_ID)
+	{
+		//Ok for IE >= IE5
+		return ((sub_system_id & PCXHR_DEVICE_IE_ID_MASK) >= proposed_IE )? 1 : 0;
+	}
+	else 
+	{
+		return pcxhr_is_device_IE(sub_system_id, proposed_IE);
+	}
+}
+
 
 #endif /* __SOUND_PCXHR_H */

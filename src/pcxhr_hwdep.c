@@ -357,9 +357,9 @@ static int pcxhr_dsp_load(struct pcxhr_mgr *mgr, int index,
 #define PCXHR_XLX_VERSION	(0x70)
 
 static int get_xilinx_version(struct pcxhr_mgr *mgr){
-        if(mgr->pci->subsystem_device & 0x0040){ // Valid only on stereo IE5 cards.
-                int xlx_version = cpu_to_be32(PCXHR_INPL(mgr, PCXHR_DSP, PCXHR_XLX_VERSION));
-                snd_printk(KERN_DEBUG "Magic : %04x Version : %04x\n", xlx_version>>16, xlx_version&0x00ff);
+		if (pcxhr_is_device_compatible_IE (mgr->pci->subsystem_device, PCXHR_DEVICE_IE5_ID)){
+				int xlx_version = cpu_to_be32(PCXHR_INPL(mgr, PCXHR_DSP, PCXHR_XLX_VERSION));
+				snd_printk(KERN_DEBUG "Magic : %04x Version : %04x\n", xlx_version>>16, xlx_version&0x00ff);
         }
         return 0;
 }

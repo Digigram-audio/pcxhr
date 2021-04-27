@@ -194,7 +194,7 @@ static int pcxhr_send_it_dsp(struct pcxhr_mgr *mgr,
 
 void pcxhr_reset_xilinx_com(struct pcxhr_mgr *mgr)
 {
-	if(  (mgr->pci->subsystem_device & 0x0040) ){
+	if (pcxhr_is_device_compatible_IE (mgr->pci->subsystem_device, PCXHR_DEVICE_IE5_ID)){
 		unsigned int chipsc;
 		chipsc = PCXHR_INPL(mgr, PCXHR_PLX, PCXHR_PLX_CHIPSC);
 		chipsc &= ~PCXHR_CHIPSC_RESET_XILINX;

@@ -228,11 +228,6 @@ static struct board_parameters pcxhr_board_params[] = {
 [PCI_ID_PCX924E_MIC_IE7] = { "PCX924e-Mic",  1, 1, 7, 44 },
 };
 
-/* IE support*/
-static const unsigned int  PCXHR_DEVICE_IE_ID_MASK = 0x00F0;
-static const unsigned int  PCXHR_DEVICE_IE5_ID = 0x0040;
-static const unsigned int  PCXHR_DEVICE_IE7_ID = 0x0060;
-
 /* boards without hw AES1 and SRC onboard are all using fw_file_set==4 */
 /* VX222HR, VX222e, PCX22HR and PCX22e */
 #define PCXHR_BOARD_HAS_AES1(x) ((x->fw_file_set != 4) && (x->fw_file_set != 6))
@@ -1627,13 +1622,7 @@ static int pcxhr_free(struct pcxhr_mgr *mgr)
 	return 0;
 }
 
-/*
- *  @return true if the subsystem_id mathes the given ID mask
- */
-static inline unsigned int pcxhr_is_device_IE (unsigned int sub_system_id, const unsigned int id_mask)
-{
-	return ((sub_system_id & PCXHR_DEVICE_IE_ID_MASK) == id_mask) ? 1 : 0 ;
-}
+
 /*
  *    probe function - creates the card manager
  */
