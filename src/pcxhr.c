@@ -1686,14 +1686,17 @@ static int pcxhr_probe(struct pci_dev *pci,
 	if (pcxhr_is_device_IE (pci->subsystem_device, PCXHR_DEVICE_IE5_ID))
 	{
 		mgr->board_revision = PCXHR_BOARD_REVISION_5;
+		snd_printk(KERN_INFO"%s(): probed IE5 board\n", __FUNCTION__);
 	}
 	else if (pcxhr_is_device_IE (pci->subsystem_device, PCXHR_DEVICE_IE7_ID))
 	{
 		mgr->board_revision = PCXHR_BOARD_REVISION_7;
+		snd_printk(KERN_INFO"%s(): probed IE7 board\n", __FUNCTION__);
 	}
 	else 
 	{
 		mgr->board_revision= PCXHR_BOARD_REVISION_BEFORE_5;
+		snd_printk(KERN_INFO"%s(): probed pre-IE5 board\n", __FUNCTION__);
 	}
 
 	//Select the right registers' addresses offset
