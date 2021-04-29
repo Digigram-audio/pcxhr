@@ -141,10 +141,11 @@
 //The default sampling rate (in Hz)
 static const unsigned int PCXHR_TI_CODECS_DEFAULT_SAMPLING_RATE = 48000;
 
-//! The min attenuation level (from Mixer) allowed on the PCM1796.(eq: -48dB)
-static const unsigned char PCXHR_PCM1796_MIN_OUTPUT_GAIN_LEVEL = 96;
-
-static const unsigned int PCXHR_PCM1796_0_DBFS = 255;
+//Follow Datasheet table and input values as given in comments of m_OutputLevelAKM[]
+// Range : from 0dB downto -50dB (level : 0 to 100)
+static const unsigned int PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE = 255;
+static const unsigned int PCXHR_PCM1796_MAX_OUTPUT_GAIN_LEVEL = 100;
+static const unsigned int PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE = PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE - PCXHR_PCM1796_MAX_OUTPUT_GAIN_LEVEL;
 
 //! ADC FS ranges border see PCM4202 data sheet (in kHz)
 static const unsigned int PCXHR_TI_ADC_SINGLE_RATE_UPPER_BORDER = 54000;
@@ -295,18 +296,19 @@ static void hr222_write_to_codec(struct pcxhr_mgr *mgr, unsigned short toWrite)
 static inline unsigned int pcxhr_ti_is_valid_output_gain_level (const int level)
 {
 	return (level >= 0) &&
-				(level <= PCXHR_PCM1796_MIN_OUTPUT_GAIN_LEVEL) ? 1 : 0;
+				(level <= PCXHR_PCM1796_MAX_OUTPUT_GAIN_LEVEL) ? 1 : 0;
 }
 
 // Return the TI DAC gain value from the given level value.
 static unsigned int pcxhr_ti_gain_level_to_register_value(const unsigned int level)
 {
-        //Follow Datasheet table and input values as given in comments of m_OutputLevelAKM[]
-        // Range : from 0dB downto -48dB
-        if (level <= PCXHR_PCM1796_MIN_OUTPUT_GAIN_LEVEL)
-                return  PCXHR_PCM1796_0_DBFS - level;       //See PCM1796 datasheet p26.    
-        else
-                return PCXHR_PCM1796_0_DBFS; //saturate
+	
+	snd_printdd("%s() : level:%u\n",__FUNCTION__,level);
+	
+	if ((PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE + level) <= PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE)
+		return  PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE + level;       //See PCM1796 datasheet p26.    
+	else
+		return PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE; //saturate 
 }
 
 #if 0
@@ -328,8 +330,6 @@ static int hr222_set_ti_hw_playback_level(struct pcxhr_mgr *mgr,
 				       int channel_id, int level)
 {
 	unsigned short cmd;
-	
-	snd_printdd("%s(channel:%d, level:%d) CALLED\n", __FUNCTION__, channel_id, level);
 	
 	if (channel_id > 1 || !pcxhr_ti_is_valid_output_gain_level(level))
 		return -EINVAL;
