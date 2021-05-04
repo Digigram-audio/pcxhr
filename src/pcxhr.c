@@ -948,9 +948,11 @@ static int pcxhr_prepare(struct snd_pcm_substream *subs)
 	struct pcxhr_mgr *mgr = chip->mgr;
 	int err = 0;
 
-	snd_printdd("pcxhr_prepare : period_size(%lx) periods(%x) buffer_size(%lx)\n",
+	snd_printdd("pcxhr_prepare : period_size(%lx) periods(%x) buffer_size(%lx) rate(%d)\n",
 		    subs->runtime->period_size, subs->runtime->periods,
-		    subs->runtime->buffer_size);
+		    subs->runtime->buffer_size,
+			subs->runtime->rate
+   			);
 
 	mutex_lock(&mgr->setup_mutex);
 

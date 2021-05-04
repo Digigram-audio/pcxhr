@@ -341,6 +341,16 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 		err = hr222_pll_freq_register(rate, &pllreg, &realfreq);
 		if (err)
 			return err;
+		
+		//Check rate and realfreq equals ?
+		if (rate != realfreq)
+		{
+			snd_printdd("%s() : WARNING possible rate is %u instead of required %u\n",
+						__FUNCTION__,
+						realfreq,
+						rate);
+			return -EINVAL;
+		}
 
 		mgr->xlx_cfg &= ~(PCXHR_CFG_CLOCKIN_SEL_MASK |
 				  PCXHR_CFG_CLOCK_UER1_SEL_MASK);
