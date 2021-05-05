@@ -345,7 +345,7 @@ int hr222_sub_set_clock(struct pcxhr_mgr *mgr,
 		//Check rate and realfreq equals ?
 		if (rate != realfreq)
 		{
-			snd_printdd("%s() : WARNING possible rate is %u instead of required %u\n",
+			snd_printk(KERN_WARNING "%s() : possible rate is %u instead of required %u\n",
 						__FUNCTION__,
 						realfreq,
 						rate);
