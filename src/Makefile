@@ -13,7 +13,7 @@ KVERSION ?= $(shell uname -r)
 KDIR  := /lib/modules/$(KVERSION)/build
 
 # Activate logs
-CFLAGS_MODULE += -DCONFIG_SND_DEBUG_VERBOSE
+# CFLAGS_MODULE += -DCONFIG_SND_DEBUG_VERBOSE
 
 # PWD is the current working directory and the location of our module
 # source files.
