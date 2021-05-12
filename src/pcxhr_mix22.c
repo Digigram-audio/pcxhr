@@ -145,6 +145,7 @@ static const unsigned int PCXHR_TI_CODECS_DEFAULT_SAMPLING_RATE = 48000;
 // Range : from 0dB downto -50dB (level : 0 to 100)
 static const unsigned int PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE = 255;
 static const unsigned int PCXHR_PCM1796_MAX_OUTPUT_GAIN_LEVEL = 100;
+static const unsigned int PCXHR_PCM1796_MUTE_OUTPUT_GAIN_VALUE = 0;
 static const unsigned int PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE = PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE - PCXHR_PCM1796_MAX_OUTPUT_GAIN_LEVEL;
 
 //! ADC FS ranges border see PCM4202 data sheet (in kHz)
@@ -304,6 +305,9 @@ static unsigned int pcxhr_ti_gain_level_to_register_value(const unsigned int lev
 {
 	
 	snd_printdd("%s() : level:%u\n",__FUNCTION__,level);
+	
+	if (level == 0)
+		return PCXHR_PCM1796_MUTE_OUTPUT_GAIN_VALUE;
 	
 	if ((PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE + level) <= PCXHR_PCM1796_MAX_OUTPUT_GAIN_VALUE)
 		return  PCXHR_PCM1796_MIN_OUTPUT_GAIN_VALUE + level;       //See PCM1796 datasheet p26.    
