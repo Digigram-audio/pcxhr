@@ -18,7 +18,7 @@ PWD   := $(shell pwd)
 
 # Set CFLAGS according to the needs
 #Activate sound logs
-CFLAGS_MODULE += -DCONFIG_SND_DEBUG_VERBOSE
+#CFLAGS_MODULE += -DCONFIG_SND_DEBUG_VERBOSE
 
 MODULES_DIR := /lib/modules/$(shell uname -r)/digigram
 # default is the default make target.  The rule here says to run make
