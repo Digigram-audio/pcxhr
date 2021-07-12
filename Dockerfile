@@ -14,7 +14,7 @@ ENV OUTPUT_DIR="/output"
 # Prepare the system with required packages
 RUN 	dnf install -y epel-release && \
 	dnf install -y 'dnf-command(config-manager)' && \
-	dnf config-manager --set-enabled PowerTools && \
+	dnf config-manager --set-enabled powertools && \
 	dnf install -y \
 		kernel-core \
 		kernel-devel \
